@@ -1,0 +1,1 @@
+from .UserDetailsSerializer import UserDetailsSerializer

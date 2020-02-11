@@ -20,6 +20,7 @@ if env('DJANGO_SETTINGS_MODULE') != 'config.settings.aws':
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+ORGANIZATION = env('ORGANIZATION')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
@@ -45,10 +46,21 @@ DJANGO_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
 ]
 
 THIRD_PARTY_APPS = [
-    'django_extensions'
+    'django_extensions',
+    'rest_framework',
+    'rest_framework.authtoken',
+    'django_filters',
+    'rest_auth',
+    'rest_auth.registration',
+    'corsheaders',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'werkzeug',
 ]
 
 LOCAL_APPS = [
@@ -135,8 +147,67 @@ USE_L10N = True
 
 USE_TZ = True
 
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/3.0/howto/static-files/
+MAIN_URL = '/'
 
 STATIC_URL = '/static/'
+
+STATIC_ROOT = str(ROOT_DIR('static'))
+
+STATICFILES_FINDERS = (
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+)
+
+# media_url for production
+MEDIA_URL = MAIN_URL + '/media/'
+MEDIA_ROOT = str(ROOT_DIR('media'))
+FILE_UPLOAD_PERMISSIONS = 0o775
+FILE_UPLOAD_DIRECTORY_PERMISSIONS = 0o775
+
+# Auth and Permissions
+
+# Configure the JWTs to expire after 6 hour,
+# and allow users to refresh near-expiration tokens
+import datetime
+JWT_AUTH = {
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(hours=6),
+    'JWT_ALLOW_REFRESH': True,
+}
+
+# Make JWT Auth the default authentication mechanism for Django
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
+        'config.settings.utils.CSRFExemptSessionAuthentication',  # Prevent CSRF issue in DRF https://stackoverflow.com/questions/30871033/django-rest-framework-remove-csrf/34316546
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    )
+}
+
+# Sets serializers for the rest auth app (These were customized)
+REST_AUTH_SERIALIZERS = {
+    'USER_DETAILS_SERIALIZER': 'apps.api.serializers.custom_rest_auth.UserDetailsSerializer',
+}
+
+# Enables django-rest-auth to use JWT tokens instead of regular tokens.
+REST_USE_JWT = True
+
+# Use this model for user
+AUTH_USER_MODEL = 'api.User'
+ACCOUNT_AUTHENTICATION_METHOD = 'username'
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_UNIQUE_EMAIL = True
+ACCOUNT_USERNAME_REQUIRED = True
+ACCOUNT_LOGOUT_ON_GET = True
+if DEBUG:
+    EMAIL_BACKEND = 'django.core.mail.backends.dummy.EmailBackend'
+
+SITE_ID = 1
+
+# Set up DB persistent connections
+CONN_MAX_AGE = None
+
+
+# Sets ask for old password before allowing change password
+OLD_PASSWORD_FIELD_ENABLED = True
