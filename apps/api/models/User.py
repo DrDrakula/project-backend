@@ -29,8 +29,7 @@ class User(AbstractUser, BaseModel):
                                     )
 
     is_manager = models.BooleanField(default=False,
-                                     help_text=f"Describes user's role in the \
-                                     {settings.ORGANIZATION} organization")
+                                     help_text=f"Describes user's role")
 
     group = models.TextField(default=False,
                              max_length=15,
