@@ -9,6 +9,14 @@ from apps.api import views  # make sure to add new views to __init__.py
 
 router = routers.DefaultRouter()
 
+router.register(r'chatrooms',
+                views.ChatroomViewSet,
+                basename='chatroom'
+                )
+router.register(r'messages',
+                views.MessageViewSet,
+                basename='message'
+                )
 router.register(r'users',
                 views.UserViewSet,
                 basename='user'
