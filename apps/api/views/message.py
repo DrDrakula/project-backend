@@ -5,7 +5,12 @@ from rest_framework.response import Response
 # Models
 from apps.api.models import Message
 # Serializers
-from apps.api.serializers import MessageSerializer, SingleMessageSerializer
+from apps.api.serializers import MessageSerializer, SingleMessageSerializer, MessagePagination
+
+class StandardResultsSetPagination(MessagePagination):
+    page_size = 100
+    page_size_query_param = 'page_size'
+    max_page_size = 100
 
 class MessageViewSet(viewsets.ModelViewSet):
     queryset = Message.objects.all().order_by('created_date')
@@ -21,4 +26,5 @@ class MessageViewSet(viewsets.ModelViewSet):
         except:
             return Response({'message': "Message not found."}, status=status.HTTP_404_NOT_FOUND)
 
+    pagination_class = StandardResultsSetPagination
     serializer_class = MessageSerializer
