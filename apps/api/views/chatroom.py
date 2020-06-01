@@ -7,9 +7,9 @@ from apps.api.models import Chatroom
 from apps.api.serializers import ChatroomSerializer, ChatroomPagination
 
 class StandardResultsSetPagination(ChatroomPagination):
-    page_size = 40
+    page_size = 20
     page_size_query_param = 'page_size'
-    max_page_size = 40
+    max_page_size = 20
 
 class ChatroomViewSet(viewsets.ModelViewSet):
     queryset = Chatroom.objects.all().order_by('name')
